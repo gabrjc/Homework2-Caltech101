@@ -26,19 +26,25 @@ class Caltech(VisionDataset):
 
         file1 = open(self.FileInput, 'r')
         Lines = file1.readlines()
-  
         
+        n_label=0
+        label_dict={}
+
         for line in Lines:
-          label = line.split("/")[0]
+          label = line.strip().split("/")[0]
           if label=="BACKGROUND_Google":
             continue
-          
+          if label_dict.get(label)==None:
+            label_dict[label]=n_label
+            n_label+=1
+
+
           self.Img_list.append(pil_loader(root+"/"+line.strip()))
-          self.Label_list.append(label)
+          self.Label_list.append(label_dict[label])
           self.Lenght += 1
 
-        print("Loaded {} Images".format(self.Lenght,split+".txt"))
-        
+        print("Loaded {} Images from {}".format(self.Lenght,split+".txt"))
+        print(label_dict)
         '''
         - Here you should implement the logic for reading the splits files and accessing elements
         - If the RAM size allows it, it is faster to store all data in memory
@@ -60,6 +66,8 @@ class Caltech(VisionDataset):
 
         image = self.Img_list[index]
         label = self.Label_list[index]
+
+
         if self.transform is not None:
             image = self.transform(image)
 
